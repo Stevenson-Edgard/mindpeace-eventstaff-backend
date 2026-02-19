@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { AccessLog, StaffMember, EventStats, Attendee, ScanStatus } from '../types/index';
 import { MOCK_LOGS, MOCK_STAFF, MOCK_ATTENDEES, GATES } from '../lib/constants';
 
@@ -229,7 +230,9 @@ class ApiService {
 
 export const api = ApiService.getInstance();
 
-const API_BASE = 'https://valda-toxicological-perspiringly.ngrok-free.dev/api/auth';
+//const API_BASE = 'https://valda-toxicological-perspiringly.ngrok-free.dev/api/auth';
+//const API_BASE = 'https://mindpeace-eventstaff-backend.onrender.com/api/auth';
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function registerUser(phone: string, password: string) {
   const res = await fetch(`${API_BASE}/register`, {
