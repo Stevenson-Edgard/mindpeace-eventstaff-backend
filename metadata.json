@@ -1,0 +1,7 @@
+{
+  "name": "MindPeace EventStaff Pro",
+  "description": "A high-end staff management and access control dashboard for large-scale events, featuring real-time monitoring, log tracking, and secure bracelet authentication.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
