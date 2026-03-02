@@ -95,6 +95,7 @@ const defaultStaff = [
 
 async function seed() {
   await mongoose.connect(MONGO_URI);
+  console.log('MONGO_URI:', MONGO_URI); // Debug: print the connection string
   await User.deleteMany({});
   await User.insertMany(defaultStaff);
   console.log('Seeded default staff members!');

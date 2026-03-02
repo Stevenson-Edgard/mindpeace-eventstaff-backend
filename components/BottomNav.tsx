@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
@@ -27,13 +27,14 @@ const BottomNav: React.FC = () => {
           </button>
         ))}
 
-        {/* Center Scanner Button */}
+        {/* Center AI Assistant Button */}
         <div className="relative -top-8">
           <button 
-            onClick={() => navigate('/scan')}
+            onClick={() => navigate('/ai-assistant')}
             className="bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl border-4 border-background-dark active:scale-90 transition-transform"
+            aria-label="AI Assistant"
           >
-            <span className="material-icons-round text-3xl">qr_code_scanner</span>
+            <Sparkles className="text-3xl" />
           </button>
         </div>
 

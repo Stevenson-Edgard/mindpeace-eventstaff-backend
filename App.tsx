@@ -7,7 +7,6 @@ import GateAssignment from './views/GateAssignment';
 import Dashboard from './views/Dashboard';
 import StaffList from './views/StaffList';
 import AccessLogs from './views/AccessLogs';
-import Scanning from './views/Scanning';
 import Authenticating from './views/Authenticating';
 import ScanSuccess from './views/ScanSuccess';
 import ScanFailure from './views/ScanFailure';
@@ -32,7 +31,7 @@ const BottomNavWrapper = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   //const hideNavOn = ['/', '/login', '/splash', '/assign', '/scan', '/authenticating', '/scan-success', '/scan-failure', '/scan-result'];
-  const hideNavOn = ['/', '/reservation', '/receipt', '/login', '/splash', '/assign', '/scan', '/authenticating', '/scan-success', '/scan-failure', '/scan-result'];
+  const hideNavOn = ['/', '/reservation', '/receipt', '/login', '/splash', '/assign', '/scan', '/authenticating', '/scan-success', '/scan-failure', '/scan-result', '/ai-assistant'];
   if (!isAuthenticated || hideNavOn.includes(location.pathname)) return null;
   return <BottomNav />;
 }
