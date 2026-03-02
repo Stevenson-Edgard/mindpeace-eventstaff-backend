@@ -1,6 +1,12 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import aquilaImg from '../assets/aquila.jpg';
+import clerveauImg from '../assets/clerveau.jpg';
+import jamesImg from '../assets/james.jpg';
+import janjanImg from '../assets/janjan.jpg';
+import myrdithImg from '../assets/myrdith.jpeg';
+import samuelImg from '../assets/samuel.jpg';
+import thamareImg from '../assets/thamare.jpg';
 
 const AttendeeInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -56,13 +62,25 @@ const AttendeeInfo: React.FC = () => {
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
   };
 
+  // Stripe payment handler (commented out)
+  // import { createStripeCheckoutSession } from '../services/stripeService';
+  // const handleStripePayment = async () => {
+  //   try {
+  //     const url = await createStripeCheckoutSession();
+  //     window.location.href = url;
+  //   } catch (err) {
+  //     alert('Failed to initiate payment. Please try again.');
+  //   }
+  // };
+
   const scheduleItems = [
-    { time: '4:30 PM', title: 'Special Guest', guest: 'Psalmiste Clerveau Lovenson', img: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=200&h=200&auto=format&fit=crop' },
-    { time: '5:45 PM', title: 'Main Speaker', guest: 'Pasteur Samuel Robuste', img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&h=200&auto=format&fit=crop' },
-    { time: '6:30 PM', title: 'Special Guest', guest: 'Psalmiste Aquila Dorvil', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&h=200&auto=format&fit=crop' },
-    { time: '7:45 PM', title: 'Special Guest', guest: 'Psalmiste Jean Jean', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&auto=format&fit=crop' },
-    { time: '8:30 PM', title: 'Special Guest', guest: 'Psalmiste Thamar', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop' },
-    { time: '9:15 PM', title: 'Special Guest', guest: 'Psalmiste Myrdith Melus', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&h=200&auto=format&fit=crop' },
+    { time: '4:30 PM', title: 'Host Guest', guest: 'Psalmiste Clerveau Lovenson', img: clerveauImg },
+    { time: '9:15 PM', title: 'MC Guest', guest: 'James Pierre', img: jamesImg },
+    { time: '5:45 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
+    { time: '6:30 PM', title: 'Special Guest', guest: 'Psalmiste Aquila Dorvil', img: aquilaImg },
+    { time: '7:45 PM', title: 'Special Guest', guest: 'Psalmiste Jean Jean', img: janjanImg },
+    { time: '8:30 PM', title: 'Special Guest', guest: 'Psalmiste Thamar', img: thamareImg },
+    { time: '9:15 PM', title: 'Special Guest', guest: 'Psalmiste Myrdith Melus', img: myrdithImg },
   ];
 
   return (
@@ -269,9 +287,17 @@ const AttendeeInfo: React.FC = () => {
               <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Authorized Entry</span>
            </div>
         </div>
-      </div>
 
-      {/* FOOTER SECTION */}
+        {/* PAYMENT SECTION
+        <div className="flex justify-center my-8">
+          <button
+            onClick={handleStripePayment}
+            className="bg-primary text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:bg-primary/90 transition-all"
+          >
+            Buy Ticket ($50)
+          </button>
+        </div>
+        */}
       <footer className="mt-auto py-12 flex flex-col items-center justify-center border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent">
         <button 
           onClick={() => navigate('/splash')}
@@ -287,6 +313,7 @@ const AttendeeInfo: React.FC = () => {
         </button>
       </footer>
     </div>
+  </div>
   );
 };
 

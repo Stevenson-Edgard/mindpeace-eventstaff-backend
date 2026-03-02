@@ -3,18 +3,25 @@
  * Implementation Step 1: Authentication & Persistence Foundation
  */
 
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import authRoutes from './routes/auth.ts';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+console.log('DEBUG ENV STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY);
+console.log('DEBUG ENV MONGO_URI:', process.env.MONGO_URI);
+console.log('DEBUG ENV GEMINI_API_KEY:', process.env.GEMINI_API_KEY);
+
+// Now import everything else
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import authRoutes from './routes/auth.ts';
+import stripeRoutes from './stripe.js';
 
 const app = express();
 app.use(cors());
@@ -27,6 +34,7 @@ mongoose.connect(process.env.MONGO_URI || '')
   .catch(err => console.error('MongoDB connection error:', err));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/stripe', stripeRoutes);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
