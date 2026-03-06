@@ -7,6 +7,7 @@ import janjanImg from '../assets/janjan.jpg';
 import myrdithImg from '../assets/myrdith.jpeg';
 import samuelImg from '../assets/samuel.jpg';
 import thamareImg from '../assets/thamare.jpg';
+import petignyImg from '../assets/petigny.jpeg';
 import flyerImg from '../assets/flyer.jpg';
 
 const AttendeeInfo: React.FC = () => {
@@ -63,9 +64,12 @@ const AttendeeInfo: React.FC = () => {
     { time: '5:15 PM', title: 'Special Guest', guest: 'Psalmiste Myrdith Melus', img: myrdithImg },
     { time: '6:00 PM', title: 'Special Guest', guest: 'Psalmiste Thamar', img: thamareImg },
     { time: '6:45 PM', title: 'Special Guest', guest: 'Psalmiste Aquila Dorvil', img: aquilaImg },
+    { time: '7:00 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
+    { time: '7:15 PM', title: 'Special Danseuse', guest: 'Danseuse', img: petignyImg },
     { time: '7:30 PM', title: 'Special Guest', guest: 'Psalmiste Clerveau Lovenson', img: clerveauImg },
     { time: '8:15 PM', title: 'Special Guest', guest: 'Psalmiste Jean Jean', img: janjanImg },
     { time: '9:00 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
+   
   ];
 // ...existing code...
 
