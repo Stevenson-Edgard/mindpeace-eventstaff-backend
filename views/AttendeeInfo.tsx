@@ -10,7 +10,7 @@ import thamareImg from '../assets/thamare.jpg';
 
 const AttendeeInfo: React.FC = () => {
   const navigate = useNavigate();
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   
