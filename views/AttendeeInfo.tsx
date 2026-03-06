@@ -65,7 +65,7 @@ const AttendeeInfo: React.FC = () => {
     { time: '6:00 PM', title: 'Special Guest', guest: 'Psalmiste Thamar', img: thamareImg },
     { time: '6:45 PM', title: 'Special Guest', guest: 'Psalmiste Aquila Dorvil', img: aquilaImg },
     { time: '7:00 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
-    { time: '7:15 PM', title: 'Special Danseuse', guest: 'Danseuse', img: petignyImg },
+    { time: '7:15 PM', title: 'Special Danseuse', guest: 'Danseuse', img: petignyImg, imgClass: 'object-top' },
     { time: '7:30 PM', title: 'Special Guest', guest: 'Psalmiste Clerveau Lovenson', img: clerveauImg },
     { time: '8:15 PM', title: 'Special Guest', guest: 'Psalmiste Jean Jean', img: janjanImg },
     { time: '9:00 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
@@ -173,7 +173,11 @@ const AttendeeInfo: React.FC = () => {
                        <span className="text-[10px] font-black text-white/40 tabular-nums uppercase">{item.time}</span>
                     </div>
                     <div className="relative shrink-0">
-                       <img src={item.img} alt={item.guest} className="w-12 h-12 rounded-xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500" />
+                       <img
+                         src={item.img}
+                         alt={item.guest}
+                         className={`w-12 h-12 rounded-xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500 ${item.imgClass ?? ''}`}
+                       />
                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#0f111a] rounded-full flex items-center justify-center border border-white/5">
                           <span className="material-icons-round text-[10px] text-emerald-500">verified</span>
                        </div>
