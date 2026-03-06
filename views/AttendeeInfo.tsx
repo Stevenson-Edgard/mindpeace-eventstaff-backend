@@ -7,6 +7,7 @@ import janjanImg from '../assets/janjan.jpg';
 import myrdithImg from '../assets/myrdith.jpeg';
 import samuelImg from '../assets/samuel.jpg';
 import thamareImg from '../assets/thamare.jpg';
+import { createStripeCheckoutSession } from '../services/stripeService';
 
 const AttendeeInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -62,16 +63,14 @@ const AttendeeInfo: React.FC = () => {
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
   };
 
-  // Stripe payment handler (commented out)
-  // import { createStripeCheckoutSession } from '../services/stripeService';
-  // const handleStripePayment = async () => {
-  //   try {
-  //     const url = await createStripeCheckoutSession();
-  //     window.location.href = url;
-  //   } catch (err) {
-  //     alert('Failed to initiate payment. Please try again.');
-  //   }
-  // };
+  const handleStripePayment = async () => {
+    try {
+      const url = await createStripeCheckoutSession();
+      window.location.href = url;
+    } catch (err) {
+      alert('Failed to initiate payment. Please try again.');
+    }
+  };
 
   const scheduleItems = [
     { time: '4:30 PM', title: 'Host Guest', guest: 'Psalmiste Clerveau Lovenson', img: clerveauImg },
@@ -288,7 +287,7 @@ const AttendeeInfo: React.FC = () => {
            </div>
         </div>
 
-        {/* PAYMENT SECTION
+        {/* PAYMENT SECTION */}
         <div className="flex justify-center my-8">
           <button
             onClick={handleStripePayment}
@@ -297,7 +296,6 @@ const AttendeeInfo: React.FC = () => {
             Buy Ticket ($50)
           </button>
         </div>
-        */}
       <footer className="mt-auto py-12 flex flex-col items-center justify-center border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent">
         <button 
           onClick={() => navigate('/splash')}

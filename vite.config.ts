@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
           'slow-books-start.loca.lt',
           'https://rare-eyes-greet.loca.lt'
         ],
+        proxy: {
+          '/api': 'http://localhost:3000',
+        },
       },
       plugins: [react()],
       define: {

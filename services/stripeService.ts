@@ -1,5 +1,3 @@
-// Stripe service removed
-
 export async function createStripeCheckoutSession() {
   const response = await fetch('/api/stripe/create-checkout-session', {
     method: 'POST',
