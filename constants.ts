@@ -2,17 +2,17 @@ import { TicketTier } from './types';
 
 // Price Configuration - Easily adjustable
 export const PRICES = {
-  EARLY_BIRD: 0.50, // Changed to 0.50 for testing as requested
-  GENERAL_ADMISSION: 79.00,
-  VIP_PLATINUM: 149.00,
-  PROCESSING_FEE: 0.1,
+  CHILDREN: 35.00, // Changed to 0.50 for testing as requested
+  ADULTS: 50.00,
+  VIP_PLATINUM: 150.00,
+  PROCESSING_FEE: 5.5,
 };
 
 export const TICKET_TIERS: TicketTier[] = [
   {
-    id: 'early-bird',
-    name: 'Early Bird',
-    price: PRICES.EARLY_BIRD,
+    id: 'children',
+    name: 'Children (Under 10)',
+    price: PRICES.CHILDREN,
     description: 'per person',
     badge: 'Limited',
     features: [
@@ -22,9 +22,9 @@ export const TICKET_TIERS: TicketTier[] = [
     ]
   },
   {
-    id: 'general-admission',
-    name: 'General Admission',
-    price: PRICES.GENERAL_ADMISSION,
+    id: 'adults',
+    name: 'Adults (10 and Up)',
+    price: PRICES.ADULTS,
     description: 'per person',
     isPopular: true,
     badge: 'Most Popular',
