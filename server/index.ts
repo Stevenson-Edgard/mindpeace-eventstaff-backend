@@ -10,11 +10,15 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Load env files in priority order for local development flexibility.
 dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '../services/.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
-console.log('DEBUG ENV STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY);
-console.log('DEBUG ENV MONGO_URI:', process.env.MONGO_URI);
-console.log('DEBUG ENV GEMINI_API_KEY:', process.env.GEMINI_API_KEY);
+console.log('DEBUG ENV STRIPE_SECRET_KEY loaded:', Boolean(process.env.STRIPE_SECRET_KEY));
+console.log('DEBUG ENV MONGO_URI loaded:', Boolean(process.env.MONGO_URI));
+console.log('DEBUG ENV GEMINI_API_KEY loaded:', Boolean(process.env.GEMINI_API_KEY));
 
 // Now import everything else
 import express from 'express';

@@ -64,9 +64,10 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
-  const [canUseApplePay, setCanUseApplePay] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
+
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  const [applePayAvailable, setApplePayAvailable] = useState(false);
 
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState({
@@ -99,14 +100,10 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
     });
 
     pr.canMakePayment().then((result) => {
-      if (result?.applePay) {
-        setCanUseApplePay(true);
-        setPaymentRequest(pr);
-      } else {
-        setCanUseApplePay(false);
-        setPaymentRequest(null);
-        if (paymentMethod === 'apple_pay') setPaymentMethod('card');
-      }
+      const available = Boolean(result?.applePay);
+      setApplePayAvailable(available);
+      setPaymentRequest(available ? pr : null);
+      if (!available && paymentMethod === 'apple_pay') setPaymentMethod('card');
     });
 
     pr.on('paymentmethod', async (ev) => {
@@ -114,7 +111,7 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
       setIsProcessing(true);
 
       try {
-        const response = await fetch('/api/create-payment-intent', {
+        const response = await fetch('/api/stripe/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: total }),
@@ -153,33 +150,44 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
 
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
-    let isValid = true;
+    let valid = true;
 
     if (!formData.name.trim()) {
       errors.name = 'Full name is required';
-      isValid = false;
+      valid = false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       errors.email = 'Email address is required';
-      isValid = false;
+      valid = false;
     } else if (!emailRegex.test(formData.email)) {
       errors.email = 'Please enter a valid email address';
-      isValid = false;
+      valid = false;
     }
 
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
     if (!formData.phone.trim()) {
       errors.phone = 'Phone number is required';
-      isValid = false;
+      valid = false;
     } else if (!phoneRegex.test(formData.phone)) {
       errors.phone = 'Please enter a valid phone number';
-      isValid = false;
+      valid = false;
     }
 
     setFormErrors(errors);
-    return isValid;
+    return valid;
+  };
+
+  const createIntent = async () => {
+    const response = await fetch('/api/stripe/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: total }),
+    });
+    const data = await response.json();
+    if (!response.ok || data.error) throw new Error(data.error || 'Failed to create payment intent');
+    return data.clientSecret;
   };
 
   const handleCardPayment = async () => {
@@ -188,16 +196,9 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
     const cardNumberElement = elements.getElement(CardNumberElement);
     if (!cardNumberElement) throw new Error('Card number field is not ready.');
 
-    const response = await fetch('/api/create-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total }),
-    });
+    const clientSecret = await createIntent();
 
-    const data = await response.json();
-    if (data.error) throw new Error(data.error);
-
-    const result = await stripe.confirmCardPayment(data.clientSecret, {
+    const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardNumberElement,
         billing_details: {
@@ -218,18 +219,13 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
     if (result.paymentIntent?.status === 'succeeded') onPay();
   };
 
-  const handlePayPalRedirect = async () => {
+  const handlePayPalFlow = async () => {
     const response = await fetch('/api/stripe/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        eventName: 'MindPeace Event',
-        ticketType: selectedTier.name,
-        quantity: 1,
-        preferredMethod: 'paypal',
+        amount: total,
+        name: `${selectedTier.name} Ticket`,
       }),
     });
 
@@ -237,7 +233,6 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
     if (!response.ok || data.error || !data.url) {
       throw new Error(data.error || 'Failed to start PayPal checkout.');
     }
-
     window.location.href = data.url;
   };
 
@@ -248,7 +243,7 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
     if (!validateForm()) return;
 
     if (paymentMethod === 'apple_pay') {
-      setError('Use the Apple Pay button in Express Checkout to complete payment.');
+      setError('Use the Apple Pay button above in Express Checkout.');
       return;
     }
 
@@ -256,8 +251,8 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
     try {
       if (paymentMethod === 'card') {
         await handleCardPayment();
-      } else if (paymentMethod === 'paypal') {
-        await handlePayPalRedirect();
+      } else {
+        await handlePayPalFlow();
       }
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');
@@ -268,10 +263,7 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
 
     if (formErrors[name as keyof FormErrors]) {
       setFormErrors((prev) => ({ ...prev, [name]: undefined }));
@@ -298,7 +290,7 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
           </div>
           <div className="flex items-center gap-1.5">
             <ShieldCheck size={10} className="text-emerald-500" />
-            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">Secure Checkout</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-500">Secure Checkout</span>
           </div>
         </div>
       </div>
@@ -308,10 +300,10 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
           <section className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="h-px bg-slate-200 flex-1" />
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Express Checkout</h3>
+              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] whitespace-nowrap">Express Checkout</h3>
               <div className="h-px bg-slate-200 flex-1" />
             </div>
-            {canUseApplePay && paymentRequest ? (
+            {applePayAvailable && paymentRequest ? (
               <div className="rounded-2xl overflow-hidden border border-slate-200">
                 <PaymentRequestButtonElement
                   options={{
@@ -346,21 +338,21 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
                   </div>
                   <div>
                     <p className="text-base font-black text-slate-900 leading-tight">{selectedTier.name} Access Pass</p>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">Unique Bracelet ID Included</p>
+                    <p className="text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">Unique Bracelet ID Included</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-black text-slate-900">${selectedTier.price.toFixed(2)}</p>
-                  <p className="text-xs text-slate-400 font-bold">Qty: 1</p>
+                  <p className="text-xs text-slate-600 font-bold">Qty: 1</p>
                 </div>
               </div>
               <div className="p-5 space-y-3 bg-slate-50/50">
                 <div className="flex justify-between text-sm font-semibold">
-                  <span className="text-slate-500">Subtotal</span>
+                  <span className="text-slate-700">Subtotal</span>
                   <span className="text-slate-900">${selectedTier.price.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-semibold">
-                  <span className="text-slate-500">Processing Fee</span>
+                  <span className="text-slate-700">Processing Fee</span>
                   <span className="text-slate-900">${processingFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-xl font-black pt-3 border-t border-slate-200">
@@ -374,72 +366,21 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
           <section className="space-y-5">
             <h3 className="text-lg font-black text-slate-900">Contact Information</h3>
             <div className="space-y-4">
-              <Input
-                label="Full Name"
-                name="name"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={handleInputChange}
-                error={formErrors.name}
-                leftIcon={<User size={20} />}
-              />
-              <Input
-                label="Email Address"
-                name="email"
-                type="email"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={handleInputChange}
-                error={formErrors.email}
-                leftIcon={<Mail size={20} />}
-              />
-              <Input
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                value={formData.phone}
-                onChange={handleInputChange}
-                error={formErrors.phone}
-                leftIcon={<Phone size={20} />}
-              />
+              <Input label="Full Name" name="name" placeholder="John Doe" value={formData.name} onChange={handleInputChange} error={formErrors.name} leftIcon={<User size={20} />} className="text-black placeholder:text-slate-500" />
+              <Input label="Email Address" name="email" type="email" placeholder="john@example.com" value={formData.email} onChange={handleInputChange} error={formErrors.email} leftIcon={<Mail size={20} />} className="text-black placeholder:text-slate-500" />
+              <Input label="Phone Number" name="phone" type="tel" placeholder="+1 (555) 000-0000" value={formData.phone} onChange={handleInputChange} error={formErrors.phone} leftIcon={<Phone size={20} />} className="text-black placeholder:text-slate-500" />
             </div>
           </section>
 
           <section className="space-y-5">
             <h3 className="text-lg font-black text-slate-900">Billing Address</h3>
             <div className="space-y-4">
-              <Input
-                label="Street Address"
-                name="address"
-                placeholder="123 Festival Way"
-                value={formData.address}
-                onChange={handleInputChange}
-                leftIcon={<MapPin size={20} />}
-              />
+              <Input label="Street Address" name="address" placeholder="123 Festival Way" value={formData.address} onChange={handleInputChange} leftIcon={<MapPin size={20} />} className="text-black placeholder:text-slate-500" />
               <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="City"
-                  name="city"
-                  placeholder="Denver"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                />
-                <Input
-                  label="Postal Code"
-                  name="postalCode"
-                  placeholder="80202"
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                />
+                <Input label="City" name="city" placeholder="Denver" value={formData.city} onChange={handleInputChange} className="text-black placeholder:text-slate-500" />
+                <Input label="Postal Code" name="postalCode" placeholder="80202" value={formData.postalCode} onChange={handleInputChange} className="text-black placeholder:text-slate-500" />
               </div>
-              <Input
-                label="Country Code"
-                name="country"
-                placeholder="US"
-                value={formData.country}
-                onChange={handleInputChange}
-              />
+              <Input label="Country Code" name="country" placeholder="US" value={formData.country} onChange={handleInputChange} className="text-black placeholder:text-slate-500" />
             </div>
           </section>
 
@@ -450,42 +391,36 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
               <button
                 type="button"
                 onClick={() => setPaymentMethod('card')}
-                className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
-                  paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white'
-                }`}
+                className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white'}`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <CreditCard size={20} className="text-slate-900" />
+                  <div className="flex items-center gap-2">
+                    <CreditCard size={18} className="text-slate-900" />
                     <span className="text-sm font-black text-slate-900">Card (Stripe)</span>
                   </div>
-                  <span className="text-xs font-bold text-slate-600">Visa / Mastercard</span>
+                  <span className="text-xs font-bold text-slate-700">Visa / Mastercard</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setPaymentMethod('paypal')}
-                className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
-                  paymentMethod === 'paypal' ? 'border-[#003087] bg-[#003087]/5' : 'border-slate-200 bg-white'
-                }`}
+                className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${paymentMethod === 'paypal' ? 'border-[#003087] bg-[#003087]/5' : 'border-slate-200 bg-white'}`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-black text-slate-900">PayPal</span>
-                  <span className="text-xs font-bold text-[#003087]">Checkout Redirect</span>
+                  <span className="text-xs font-bold text-[#003087]">Redirect Checkout</span>
                 </div>
               </button>
 
               <button
                 type="button"
-                onClick={() => canUseApplePay && setPaymentMethod('apple_pay')}
-                className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
-                  paymentMethod === 'apple_pay' ? 'border-black bg-black/5' : 'border-slate-200 bg-white'
-                } ${!canUseApplePay ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={() => applePayAvailable && setPaymentMethod('apple_pay')}
+                className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${paymentMethod === 'apple_pay' ? 'border-black bg-black/5' : 'border-slate-200 bg-white'} ${!applePayAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-black text-slate-900">Apple Pay</span>
-                  <span className="text-xs font-bold text-slate-700">{canUseApplePay ? 'Available' : 'Unavailable'}</span>
+                  <span className="text-xs font-bold text-slate-700">{applePayAvailable ? 'Available' : 'Unavailable'}</span>
                 </div>
               </button>
             </div>
@@ -515,34 +450,21 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
                 </div>
 
                 <div className="flex items-center gap-3 px-1">
-                  <input
-                    type="checkbox"
-                    id="save-card"
-                    name="saveCard"
-                    checked={formData.saveCard}
-                    onChange={handleInputChange}
-                    className="size-4 rounded border-slate-300 text-primary focus:ring-primary/20"
-                  />
-                  <label htmlFor="save-card" className="text-xs font-bold text-slate-600 cursor-pointer">
-                    Save card for future purchases
-                  </label>
+                  <input type="checkbox" id="save-card" name="saveCard" checked={formData.saveCard} onChange={handleInputChange} className="size-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
+                  <label htmlFor="save-card" className="text-xs font-bold text-slate-700 cursor-pointer">Save card for future purchases</label>
                 </div>
               </div>
             )}
 
-            {paymentMethod === 'apple_pay' && (
+            {paymentMethod === 'paypal' && (
               <Card className="p-4 bg-white border-slate-200">
-                <p className="text-sm font-semibold text-slate-700">
-                  Use the Apple Pay button in Express Checkout to complete this payment.
-                </p>
+                <p className="text-sm font-semibold text-slate-700">You will be redirected to secure checkout after pressing the pay button.</p>
               </Card>
             )}
 
-            {paymentMethod === 'paypal' && (
+            {paymentMethod === 'apple_pay' && (
               <Card className="p-4 bg-white border-slate-200">
-                <p className="text-sm font-semibold text-slate-700">
-                  Continue to secure checkout to finish payment with PayPal.
-                </p>
+                <p className="text-sm font-semibold text-slate-700">Use the Apple Pay button in Express Checkout above.</p>
               </Card>
             )}
 
@@ -557,9 +479,7 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
               <ShieldCheck className="text-slate-600 shrink-0 mt-0.5" size={20} />
               <div className="space-y-1">
                 <p className="text-[11px] text-slate-600 font-bold leading-relaxed">PCI DSS Compliant & Secure Payment</p>
-                <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                  Your payment is secured with SSL encryption.
-                </p>
+                <p className="text-[10px] text-slate-500 font-medium leading-relaxed">Your payment is secured with SSL encryption.</p>
               </div>
             </div>
           </section>
@@ -571,7 +491,7 @@ export default function Checkout({ selectedTier, onBack, onPay }: CheckoutProps)
             fullWidth
             size="xl"
             isLoading={isProcessing}
-            disabled={!stripe || isProcessing || (paymentMethod === 'apple_pay' && canUseApplePay)}
+            disabled={!stripe || isProcessing || (paymentMethod === 'apple_pay' && applePayAvailable)}
             className="rounded-2xl h-16 shadow-xl shadow-primary/20"
             leftIcon={!isProcessing && <Lock size={20} />}
           >

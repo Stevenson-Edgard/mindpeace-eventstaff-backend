@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
         'rare-eyes-greet.loca.lt'
       ],
       proxy: {
-        '/api': 'http://localhost:3000',
+        '/api': 'http://localhost:5050',
       },
       hmr: process.env.DISABLE_HMR !== 'true',
     },

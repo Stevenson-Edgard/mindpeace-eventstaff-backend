@@ -31,3 +31,5 @@ dist-ssr
 *.key
 *.pem
 *.crt
+.vercel
+.env*.local

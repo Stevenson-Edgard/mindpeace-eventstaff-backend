@@ -7,7 +7,11 @@ import AppRoutes from './components/AppRoutes';
 import BottomNav from './components/BottomNav';
 import GlobalAlerts from './components/GlobalAlerts';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+const publishableKey =
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_PUBLIC_KEY ||
+  '';
+const stripePromise = loadStripe(publishableKey);
 
 const AppContent: React.FC = () => {
   return (
