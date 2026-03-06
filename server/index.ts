@@ -21,7 +21,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import authRoutes from './routes/auth.ts';
-import stripeRoutes from './stripe.js';
+import stripeRoutes from './stripe.js'; // or './stripe' if using .ts
 
 const app = express();
 app.use(cors());

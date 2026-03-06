@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createStripeCheckoutSession } from '../services/stripeService';
 
 const ReservationPayment: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const ReservationPayment: React.FC = () => {
     VIP: { name: 'VIP Revival Pass', price: 125, perks: ['Front Row Access', 'Exclusive VIP Lounge', 'Gourmet Refreshments', 'Premium LED Bracelet'] }
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (step === 'select') setStep('details');
     else if (step === 'details') {
       if (!formData.name || !formData.email) {
@@ -25,19 +25,20 @@ const ReservationPayment: React.FC = () => {
     }
     else {
       setIsProcessing(true);
-      // Simulate Stripe payment processing
-      setTimeout(() => {
-        setIsProcessing(false);
-        navigate('/receipt', { 
-          state: { 
-            payerName: formData.name,
-            tier: tiers[selectedTier].name,
-            amount: tiers[selectedTier].price + 2.50,
-            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-            transactionId: `MP-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-          } 
+      try {
+        // Call your backend to create a Stripe Checkout session
+        const url = await createStripeCheckoutSession({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          tier: selectedTier,
         });
-      }, 2500);
+        window.location.href = url; // Redirect to Stripe Checkout
+      } catch (err) {
+        alert('Failed to initiate payment. Please try again.');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 

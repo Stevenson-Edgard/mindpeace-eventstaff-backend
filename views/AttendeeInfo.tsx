@@ -65,7 +65,14 @@ const AttendeeInfo: React.FC = () => {
 
   const handleStripePayment = async () => {
     try {
-      const url = await createStripeCheckoutSession();
+      // Provide the required payload for creating a Stripe Checkout session.
+      // Replace these placeholder values with real attendee data as needed.
+      const url = await createStripeCheckoutSession({
+        name: 'Attendee',
+        email: 'attendee@example.com',
+        phone: '0000000000',
+        tier: 'GA',
+      });
       window.location.href = url;
     } catch (err) {
       alert('Failed to initiate payment. Please try again.');

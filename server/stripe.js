@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 const router = express.Router();
 
 router.post('/create-checkout-session', async (req, res) => {
+  const { name, email, phone, eventName, ticketType, quantity } = req.body;
+
   // Initialize Stripe here, after dotenv is loaded in index.ts
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
