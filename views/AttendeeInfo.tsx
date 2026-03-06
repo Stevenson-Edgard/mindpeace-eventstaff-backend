@@ -62,15 +62,25 @@ const AttendeeInfo: React.FC = () => {
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
   };
 
+  const handleBuyTicket = () => {
+    window.open(
+      'https://www.eventbrite.com/e/worship-concert-ou-soti-lwen-avem-jezi-tickets-1984493181527?aff=oddtdtcreator',
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
+  
   const scheduleItems = [
-    { time: '4:30 PM', title: 'Host Guest', guest: 'Psalmiste Clerveau Lovenson', img: clerveauImg },
-    { time: '9:15 PM', title: 'MC Guest', guest: 'James Pierre', img: jamesImg },
-    { time: '5:45 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
-    { time: '6:30 PM', title: 'Special Guest', guest: 'Psalmiste Aquila Dorvil', img: aquilaImg },
-    { time: '7:45 PM', title: 'Special Guest', guest: 'Psalmiste Jean Jean', img: janjanImg },
-    { time: '8:30 PM', title: 'Special Guest', guest: 'Psalmiste Thamar', img: thamareImg },
-    { time: '9:15 PM', title: 'Special Guest', guest: 'Psalmiste Myrdith Melus', img: myrdithImg },
+    { time: '4:30 PM', title: 'Host', guest: 'James Pierre', img: jamesImg },
+    { time: '5:15 PM', title: 'Special Guest', guest: 'Psalmiste Myrdith Melus', img: myrdithImg },
+    { time: '6:00 PM', title: 'Special Guest', guest: 'Psalmiste Thamar', img: thamareImg },
+    { time: '6:45 PM', title: 'Special Guest', guest: 'Psalmiste Aquila Dorvil', img: aquilaImg },
+    { time: '7:30 PM', title: 'Special Guest', guest: 'Psalmiste Clerveau Lovenson', img: clerveauImg },
+    { time: '8:15 PM', title: 'Special Guest', guest: 'Psalmiste Jean Jean', img: janjanImg },
+    { time: '9:00 PM', title: 'Special Speaker', guest: 'Pasteur Samuel Robuste', img: samuelImg },
   ];
+// ...existing code...
 
   return (
     <div 
@@ -248,16 +258,14 @@ const AttendeeInfo: React.FC = () => {
           )}
         </div>
 
-        {/*
-          <div className="pt-2">
-            <button
-              onClick={() => navigate('/tickets')}
-              className="w-full bg-primary text-white px-8 py-4 rounded-2xl text-base font-black shadow-lg hover:bg-primary/90 transition-all uppercase tracking-[0.08em]"
-            >
-              Get Ticket
-            </button>
-          </div>
-        */}
+        <div className="pt-2">
+          <button
+            onClick={handleBuyTicket}
+            className="w-full bg-primary text-white px-8 py-4 rounded-2xl text-base font-black shadow-lg hover:bg-primary/90 transition-all uppercase tracking-[0.08em]"
+          >
+            Buy Ticket
+          </button>
+        </div>
 
       <footer className="mt-auto py-12 flex flex-col items-center justify-center border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent">
         <button 
