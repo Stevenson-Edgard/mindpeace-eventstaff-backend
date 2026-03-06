@@ -7,7 +7,6 @@ import janjanImg from '../assets/janjan.jpg';
 import myrdithImg from '../assets/myrdith.jpeg';
 import samuelImg from '../assets/samuel.jpg';
 import thamareImg from '../assets/thamare.jpg';
-import { createStripeCheckoutSession } from '../services/stripeService';
 
 const AttendeeInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -61,22 +60,6 @@ const AttendeeInfo: React.FC = () => {
   const handleOpenMap = () => {
     const location = "933 Goodrich St, Uniondale, NY 11553"; 
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
-  };
-
-  const handleStripePayment = async () => {
-    try {
-      // Provide the required payload for creating a Stripe Checkout session.
-      // Replace these placeholder values with real attendee data as needed.
-      const url = await createStripeCheckoutSession({
-        name: 'Attendee',
-        email: 'attendee@example.com',
-        phone: '0000000000',
-        tier: 'GA',
-      });
-      window.location.href = url;
-    } catch (err) {
-      alert('Failed to initiate payment. Please try again.');
-    }
   };
 
   const scheduleItems = [
@@ -221,22 +204,6 @@ const AttendeeInfo: React.FC = () => {
                 </button>
              </div>
 
-             <button 
-                onClick={() => navigate('/reservation')}
-                className="w-full text-left p-6 flex items-center space-x-5 active:bg-white/[0.05] transition-colors group relative"
-             >
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <span className="material-icons-round text-xl">watch</span>
-                </div>
-                <div className="flex-1">
-                   <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Bracelets</p>
-                   <div className="flex items-center gap-2">
-                     <p className="text-sm font-bold text-white uppercase tracking-wider">RESERVATION</p>
-                     <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-500 text-[8px] font-black rounded uppercase tracking-widest border border-orange-500/20">Required</span>
-                   </div>
-                </div>
-                <span className="material-icons-round text-white/20 group-hover:text-primary transition-colors">chevron_right</span>
-             </button>
           </div>
         </div>
 
@@ -281,28 +248,15 @@ const AttendeeInfo: React.FC = () => {
           )}
         </div>
 
-        {/* ACTIVE PASS */}
-        <div className="bg-gradient-to-br from-[#0a122a] to-[#05060a] border border-primary/10 rounded-[32px] p-8 flex flex-col items-center shadow-2xl relative overflow-hidden">
-           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-[40px]"></div>
-           <div className="relative w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center border border-primary/10 mb-4 text-primary">
-              <span className="material-icons-round text-4xl animate-pulse">qr_code_2</span>
-           </div>
-           <p className="text-base font-black text-white uppercase tracking-[0.3em] text-center">Active Pass</p>
-           <p className="text-[10px] text-primary/40 font-bold uppercase tracking-[0.5em] mt-2">UID: BR-882-VIP-2026</p>
-           <div className="mt-6 px-5 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Authorized Entry</span>
-           </div>
-        </div>
-
-        {/* PAYMENT SECTION */}
-        <div className="flex justify-center my-8">
+        <div className="pt-2">
           <button
-            onClick={handleStripePayment}
-            className="bg-primary text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:bg-primary/90 transition-all"
+            onClick={() => navigate('/tickets')}
+            className="w-full bg-primary text-white px-8 py-4 rounded-2xl text-base font-black shadow-lg hover:bg-primary/90 transition-all uppercase tracking-[0.08em]"
           >
-            Buy Ticket ($50)
+            Get Ticket
           </button>
         </div>
+
       <footer className="mt-auto py-12 flex flex-col items-center justify-center border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent">
         <button 
           onClick={() => navigate('/splash')}

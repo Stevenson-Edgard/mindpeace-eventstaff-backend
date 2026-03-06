@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Login from '../views/Login';
 import GateAssignment from '../views/GateAssignment';
@@ -14,17 +14,78 @@ import AttendeeInfo from '../views/AttendeeInfo';
 import ReservationPayment from '../views/ReservationPayment';
 import SplashScreen from '../views/SplashScreen';
 import Profile from '../views/Profile';
-import PaymentReceipt from '../views/PaymentReceipt';
+
 import AiAssistant from '../views/AiAssistant';
 import FollowUpForm from '../views/FollowUpForm';
+import Confirmation from './Confirmation';
+import Checkout from './Checkout';
+import TicketSelection from './TicketSelection';
+
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [selectedTier, setSelectedTier] = React.useState<any>(null);
+
+  const handleSelectTier = (tier: any) => {
+    setSelectedTier(tier);
+  };
+
+  const handleContinue = () => {
+    navigate('/checkout');
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handlePay = (paymentInfo?: any) => {
+    // perform payment logic here or forward paymentInfo to a service
+    navigate('/confirmation');
+  };
+
   return (
     <Routes>
       <Route path="/" element={<AttendeeInfo />} />
       <Route path="/reservation" element={<ReservationPayment />} />
-      <Route path="/receipt" element={<PaymentReceipt />} />
+      <Route
+        path="/tickets"
+        element={
+          <TicketSelection
+            selectedTier={selectedTier}
+            onSelectTier={handleSelectTier}
+            onContinue={handleContinue}
+          />
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          selectedTier ? (
+            <Checkout
+              selectedTier={selectedTier}
+              onBack={handleBack}
+              onPay={handlePay}
+            />
+          ) : (
+            <Navigate to="/tickets" replace />
+          )
+        }
+      />
+      <Route
+        path="/confirmation"
+        element={
+          selectedTier ? (
+            <Confirmation
+              selectedTier={selectedTier}
+              onSelectTier={handleSelectTier}
+              onContinue={handleContinue}
+            />
+          ) : (
+            <Navigate to="/tickets" replace />
+          )
+        }
+      />
       <Route path="/splash" element={<SplashScreen />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/assign" /> : <Login />} /> 
       <Route path="/assign" element={isAuthenticated ? <GateAssignment /> : <Navigate to="/login" />} />
