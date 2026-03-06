@@ -7,11 +7,11 @@ import janjanImg from '../assets/janjan.jpg';
 import myrdithImg from '../assets/myrdith.jpeg';
 import samuelImg from '../assets/samuel.jpg';
 import thamareImg from '../assets/thamare.jpg';
+import flyerImg from '../assets/flyer.jpg';
 
 const AttendeeInfo: React.FC = () => {
   const navigate = useNavigate();
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
-  const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Official Event Target: April 12, 2026 at 18:00 (6:00 PM)
@@ -23,19 +23,6 @@ const AttendeeInfo: React.FC = () => {
     minutes: 0,
     seconds: 0
   });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (containerRef.current) {
-        setScrollY(containerRef.current.scrollTop);
-      }
-    };
-    const el = containerRef.current;
-    if (el) {
-      el.addEventListener('scroll', handleScroll, { passive: true });
-      return () => el.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -88,77 +75,16 @@ const AttendeeInfo: React.FC = () => {
       className="flex-1 flex flex-col bg-[#05060a] min-h-screen font-sans text-slate-100 overflow-y-auto hide-scrollbar select-none"
     >
       {/* --- HERO SECTION --- */}
-      <div className="relative h-[75vh] w-full overflow-hidden bg-black shrink-0">
-        {/* Parallax Background */}
-        <div 
-          className="absolute inset-0 z-0"
-          style={{ 
-            transform: `translateY(${scrollY * 0.15}px) scale(1.15)`,
-            transition: 'transform 0.05s linear'
-          }}
-        >
-          <img 
-            alt="Revival Atmosphere" 
-            className="w-full h-full object-cover opacity-40 blur-[1px]" 
-            src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/30 to-[#05060a]"></div>
-        </div>
-
-        {/* Top Header */}
-        <div className="relative z-30 pt-10 px-6 flex justify-between items-center w-full">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 flex items-center justify-center border border-white/10 rounded-xl bg-white/5 backdrop-blur-xl">
-              <span className="text-lg font-black tracking-tighter text-white">MP</span>
-            </div>
-            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-white/40">
-              MindPeace Prodz
-            </span>
-          </div>
-          
-          <div className="bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full backdrop-blur-md">
-            <div className="flex items-center space-x-2">
-              <span className="material-icons-round text-[10px] text-emerald-400 animate-pulse">verified</span>
-              <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest">Pass Verified</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Central Layout */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-start pt-20 px-8">
-          <div className="text-center mb-4">
-             <span className="text-[10px] font-black tracking-[0.6em] text-primary uppercase mb-3 block opacity-80">Save the Date</span>
-             <div className="flex items-baseline space-x-1.5 justify-center">
-                <span className="text-[100px] font-black leading-none tracking-tighter text-white">12</span>
-                <div className="flex flex-col items-start -mb-2">
-                   <span className="text-[22px] font-black text-orange-500 italic leading-none">th</span>
-                   <span className="text-[14px] font-bold text-white/30 uppercase tracking-[0.4em]">April</span>
-                </div>
-             </div>
-          </div>
-
-          <h1 className="text-[60px] font-black leading-none tracking-tighter text-white uppercase italic text-center drop-shadow-2xl mb-8">
-            REVIVAL
-          </h1>
-
-          <div className="w-full max-w-[280px] animate-in fade-in slide-in-from-bottom-6 duration-1000">
-             <div className="bg-white rounded-[24px] px-6 py-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center relative overflow-hidden active:scale-95 transition-all">
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-orange-500"></div>
-                <span className="text-[11px] font-black uppercase tracking-[0.25em] text-black text-center leading-tight">
-                  OU SOTI LWEN AVÈM JEZI
-                </span>
-                <div className="flex items-center space-x-2 mt-2.5">
-                   <div className="w-8 h-[1px] bg-black/10"></div>
-                   <span className="material-icons-round text-[12px] text-orange-500">auto_awesome</span>
-                   <div className="w-8 h-[1px] bg-black/10"></div>
-                </div>
-             </div>
-          </div>
-        </div>
+      <div className="relative w-full overflow-hidden bg-[#030406] shrink-0">
+        <img
+          alt="Event Flyer"
+          className="block w-full h-auto"
+          src={flyerImg}
+        />
       </div>
 
       {/* --- CONTENT AREA --- */}
-      <div className="px-6 -mt-10 relative z-30 space-y-10 pb-20 shrink-0">
+      <div className="px-6 pt-5 relative z-30 space-y-10 pb-20 shrink-0">
         
         {/* COUNTDOWN SECTION */}
         <div className="space-y-4">
@@ -263,7 +189,7 @@ const AttendeeInfo: React.FC = () => {
             onClick={handleBuyTicket}
             className="w-full bg-primary text-white px-8 py-4 rounded-2xl text-base font-black shadow-lg hover:bg-primary/90 transition-all uppercase tracking-[0.08em]"
           >
-            Buy Ticket
+            Get Tickets 
           </button>
         </div>
 
