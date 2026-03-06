@@ -248,14 +248,16 @@ const AttendeeInfo: React.FC = () => {
           )}
         </div>
 
-        <div className="pt-2">
-          <button
-            onClick={() => navigate('/tickets')}
-            className="w-full bg-primary text-white px-8 py-4 rounded-2xl text-base font-black shadow-lg hover:bg-primary/90 transition-all uppercase tracking-[0.08em]"
-          >
-            Get Ticket
-          </button>
-        </div>
+        {/*
+          <div className="pt-2">
+            <button
+              onClick={() => navigate('/tickets')}
+              className="w-full bg-primary text-white px-8 py-4 rounded-2xl text-base font-black shadow-lg hover:bg-primary/90 transition-all uppercase tracking-[0.08em]"
+            >
+              Get Ticket
+            </button>
+          </div>
+        */}
 
       <footer className="mt-auto py-12 flex flex-col items-center justify-center border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent">
         <button 
