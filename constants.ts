@@ -5,7 +5,7 @@ export const PRICES = {
   CHILDREN: 35.00, // Changed to 0.50 for testing as requested
   ADULTS: 50.00,
   VIP_PLATINUM: 150.00,
-  PROCESSING_FEE: 5.5,
+  PROCESSING_FEE: 1.5,
 };
 
 export const TICKET_TIERS: TicketTier[] = [
