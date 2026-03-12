@@ -202,7 +202,7 @@ const AttendeeInfo: React.FC = () => {
 
       <footer className="mt-auto py-12 flex flex-col items-center justify-center border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent">
         <button 
-          onClick={() => navigate('/splash')}
+          onClick={() => navigate('/')}
           className="flex flex-col items-center space-y-2 active:scale-95 transition-transform opacity-60 hover:opacity-100"
           aria-label="Staff Access"
         >
